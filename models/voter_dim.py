@@ -31,6 +31,6 @@ class VoterDim(Base):
     valid_to = Column('valid_to', DATE)
 
     def __repr__(self):
-        return '<Voter(id={0}, name={1}{2})>'.format(self.voter_id,
-                                                     self.address_line1,
-                                                     self.address_line2)
+        return '<Voter(id={0}, name={1} {2})>'.format(self.voter_id,
+                                                     self.first_name,
+                                                     self.last_name)

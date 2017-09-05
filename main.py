@@ -2,6 +2,7 @@ import argparse
 import sys
 import os
 import yaml
+from geocode.google import GoogleGeocoder
 
 from db.postgresql_connector import PostgreSQLConnector
 from db.query import get_voters_for_precinct
@@ -14,6 +15,16 @@ def load_config(filename):
     else:
         with open(os.path.realpath(filename)) as f:
             return yaml.load(f)
+
+
+def write_geocodes_to_text(geocoder, voters_mailing_addresses):
+    with open('viz/geocoded_addresses.csv', 'w') as f:
+        f.write("address_id,address,lat,long\n")
+        for voter in voters_mailing_addresses:
+            lat, long = geocoder.get_lat_long_for_address(voter)
+            if lat and long:
+                f.write("{0},{1},{2},{3}\n".format(voter.mailing_address_id, voter.to_address_string(), lat, long))
+    f.close()
 
 
 if __name__ == '__main__':
@@ -38,6 +49,9 @@ if __name__ == '__main__':
         print('Please set config variable PG_ENGINE_STRING to valid PostgreSQL connection')
         exit(8)
 
-    db_session = PostgreSQLConnector().connect(engine_string=engine_string)
-    voters = get_voters_for_precinct(db_session, args.get('precinct'))
+    google_geocoder = GoogleGeocoder(config['GOOGLE_GEOCODE_API_KEY'])
 
+    db_session = PostgreSQLConnector().connect(engine_string=engine_string)
+    voters_mailing_address = get_voters_for_precinct(db_session, args.get('precinct'))
+
+    write_geocodes_to_text(google_geocoder, voters_mailing_address)
