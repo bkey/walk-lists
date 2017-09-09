@@ -5,7 +5,7 @@ import yaml
 from geocode.google import GoogleGeocoder
 
 from db.postgresql_connector import PostgreSQLConnector
-from db.query import get_voters_for_precinct
+from db.query import get_voters_for_district
 
 
 def load_config(filename):
@@ -17,13 +17,19 @@ def load_config(filename):
             return yaml.load(f)
 
 
+def join_non_none(list_to_join, sep=" "):
+    return " ".join([x for x in list_to_join if x])
+
+
 def write_geocodes_to_text(geocoder, voters_mailing_addresses):
     with open('viz/geocoded_addresses.csv', 'w') as f:
         f.write("address_id,address,lat,long\n")
         for voter in voters_mailing_addresses:
-            lat, long = geocoder.get_lat_long_for_address(voter)
+            address_string = join_non_none(voter[:4])
+            apt_numbers = join_non_none(voter[4], ";")
+            lat, long = geocoder.get_lat_long_for_address(address_string)
             if lat and long:
-                f.write("{0},{1},{2},{3}\n".format(voter.mailing_address_id, voter.to_address_string(), lat, long))
+                f.write("{0},{1},{2},{3}\n".format(address_string, lat, long, voter[5], apt_numbers))
     f.close()
 
 
@@ -37,8 +43,8 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
-    parser.add_argument('-p', '--precinct', dest='precinct',
-                        help='The precinct number for which to get addresses', default=5487)
+    parser.add_argument('-d', '--district', dest='district',
+                        help='House District Key', default=779)
     parser.add_argument('-c', '--config', dest='config', help='location of configuration file')
 
     args = vars(parser.parse_args())
@@ -52,6 +58,6 @@ if __name__ == '__main__':
     google_geocoder = GoogleGeocoder(config['GOOGLE_GEOCODE_API_KEY'])
 
     db_session = PostgreSQLConnector().connect(engine_string=engine_string)
-    voters_mailing_address = get_voters_for_precinct(db_session, args.get('precinct'))
+    voters_mailing_address = get_voters_for_district(db_session, args.get('precinct'))
 
     write_geocodes_to_text(google_geocoder, voters_mailing_address)

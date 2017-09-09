@@ -1,18 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Voter Heatmap</title>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-    </head>
+    <meta charset="utf-8">
+    <title>Voter Heatmap</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+</head>
 <body>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.js"></script>
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+<script type="text/javascript"
+        src="http://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
 
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 <script src="http://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
 <div id="map" style="width: 1200px; height: 800px"></div>
-<script type="text/javascript"charset="utf-8">
+<script type="text/javascript" charset="utf-8">
 
 $(document).ready(function() {
   $.ajax({
@@ -41,19 +42,21 @@ function displayData(file_data){
   for (i = 1; i < data.length; i++) {
     lat = parseFloat(data[i].lat);
     lng = parseFloat(data[i].long);
-    pt = new L.latLng(lat, lng);
-    data_array.push(pt);
+    //pt = new L.latLng(lat, lng);
+    console.log(parseFloat(data[i].count));
+    data_array.push([lat, lng, parseFloat(data[i].count)]);
 
-    L.circle([lat, lng], 3,{color: 'black'}).addTo(map)
+    L.circle([lat, lng], 3, {color: 'black'}).addTo(map)
   };
 
-  var heat = L.heatLayer(data_array,{
+  var heat = L.heatLayer(data_array, {
           radius: 15,
           blur: 20,
           maxZoom: 6,
       }).addTo(map);
 
 }
+
 </script>
 </body>
 </html>

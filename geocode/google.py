@@ -9,8 +9,7 @@ class GoogleGeocoder(object):
     def __init__(self, api_key):
         self.api_key = api_key
 
-    def get_lat_long_for_address(self, mailing_address_dim):
-        address_string = mailing_address_dim.to_address_string()
+    def get_lat_long_for_address(self, address_string):
         parameters = {
             'key': self.api_key,
             'address': address_string
