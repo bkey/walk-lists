@@ -42,8 +42,6 @@ function displayData(file_data){
   for (i = 1; i < data.length; i++) {
     lat = parseFloat(data[i].lat);
     lng = parseFloat(data[i].long);
-    //pt = new L.latLng(lat, lng);
-    console.log(parseFloat(data[i].count));
     data_array.push([lat, lng, parseFloat(data[i].count)]);
 
     L.circle([lat, lng], 3, {color: 'black'}).addTo(map)

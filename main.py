@@ -23,13 +23,13 @@ def join_non_none(list_to_join, sep=" "):
 
 def write_geocodes_to_text(geocoder, voters_mailing_addresses):
     with open('viz/geocoded_addresses.csv', 'w') as f:
-        f.write("address_id,address,lat,long\n")
+        f.write("address_id,address,lat,long,count,apt_numbers\n")
         for voter in voters_mailing_addresses:
             address_string = join_non_none(voter[:4])
             apt_numbers = join_non_none(voter[4], ";")
             lat, long = geocoder.get_lat_long_for_address(address_string)
             if lat and long:
-                f.write("{0},{1},{2},{3}\n".format(address_string, lat, long, voter[5], apt_numbers))
+                f.write("{0},{1},{2},{3},{4}\n".format(address_string, lat, long, voter[5], apt_numbers))
     f.close()
 
 
@@ -58,6 +58,6 @@ if __name__ == '__main__':
     google_geocoder = GoogleGeocoder(config['GOOGLE_GEOCODE_API_KEY'])
 
     db_session = PostgreSQLConnector().connect(engine_string=engine_string)
-    voters_mailing_address = get_voters_for_district(db_session, args.get('precinct'))
+    voters_mailing_address = get_voters_for_district(db_session, args.get('district'))
 
     write_geocodes_to_text(google_geocoder, voters_mailing_address)
